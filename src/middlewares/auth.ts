@@ -25,25 +25,26 @@ export const auth = (...roles : UserRole[])=>{
         // is user status active
       try {
           const token = req.headers.authorization;
+          console.log("Token:", token);
         if(!token){
             throw new Error("token not foound")
         }
         const decode = jwt.verify(token,secret) as JwtPayload
 
-
+        console.log("decode info",decode);
         const isUserExits = await prisma.user.findUnique({
             where : {
                 email: decode.email
             }
         })
-
+        console.log("isUserExits",isUserExits);
         if(!isUserExits){
             throw new Error("Unauthorized")
         }
 
        
-
-        if(roles.length && roles.includes(decode.role)){
+        console.log("roles",roles);
+        if(roles.length && !roles.includes(decode.role)){
             throw new Error("Unauthorized")
         }
 
