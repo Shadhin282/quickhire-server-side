@@ -5,8 +5,13 @@ const getAllJobs: RequestHandler = (req,res)=>{
 
 }
 
+const getJobByid: RequestHandler = (req,res)=>{
+
+}
+
 
 export const JobsController = {
     // Add controller methods here
-    getAllJobs
+    getAllJobs,
+    getJobByid,
     };
