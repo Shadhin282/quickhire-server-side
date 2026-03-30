@@ -4,7 +4,15 @@ import { JobsService } from "./jobs.service";
 
 const getAllJobs: RequestHandler = async (req,res)=>{
     try {
-        const result = await JobsService.getAllJobs();
+
+        const search = req.query.search as string | undefined;
+        const category = req.query.category as string | undefined;
+        const location = req.query.location as string | undefined;
+        console.log("Search query:", search); // Debugging log
+        console.log("Category query:", category); // Debugging log
+        console.log("Location query:", location); // Debugging log
+        const result = await JobsService.getAllJobs(search,category,location);
+        
         res.status(200).json({
             success: true,
             message: "Jobs retrieved successfully",
