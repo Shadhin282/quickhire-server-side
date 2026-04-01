@@ -1370,6 +1370,6 @@ This project is licensed under the ISC License - see the LICENSE file for detail
 
 ### Made with ❤️ by the QuickHire Team
 
-**[Live API](https://api.quickhire.com)** • **[Report Bug](../../issues)** • **[Request Feature](../../issues)**
+**[Live API](https://quickhire-server-kappa.vercel.app/)** • **[Report Bug](../../issues)** • **[Request Feature](../../issues)**
 
 </div>
