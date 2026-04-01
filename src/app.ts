@@ -1,4 +1,4 @@
-import express, { Application, Request, Response } from 'express';
+import express, { Application, Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import { notFound } from './middlewares/notFound';
 import { IndexRoutes } from './routes';
@@ -19,5 +19,16 @@ app.get('/', (req: Request, res: Response) => {
 });
 
 app.use(notFound);
+
+// Global error handler middleware - must be last
+app.use((error: any, req: Request, res: Response, next: NextFunction) => {
+  console.error('Error:', error.message);
+  
+  res.status(error.status || 500).json({
+    success: false,
+    message: error.message || 'Internal Server Error',
+    data: null,
+  });
+});
 
 export default app;

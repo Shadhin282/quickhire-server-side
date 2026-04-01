@@ -8,13 +8,25 @@ export const secret = 'kdjfkjkfjdjfklfffkjkdk'
 
 const register = async(payload: any)=>{
     const hashPassword = await bcrypt.hash(payload.password,8)
-        const result = await prisma.user.create({
-            data : {...payload,
-                password : hashPassword
-            }
-        })
-        const {password, ...newResult} = result;
-        return newResult
+    const result = await prisma.user.create({
+        data : {...payload,
+            password : hashPassword
+        }
+    })
+    const {password, ...newResult} = result;
+    
+    // Generate token for new user
+    const token = jwt.sign({
+        id: newResult.id,
+        name: newResult.name,
+        email: newResult.email,
+        role: newResult.role,
+    }, secret, { expiresIn: "1d" });
+    
+    return {
+        token,
+        user: newResult
+    }
 }
 
 const login = async (payload: any)=>{
@@ -47,7 +59,7 @@ const login = async (payload: any)=>{
   
   return {
     token,
-    user,
+    user: userData,
   };
 
 }

@@ -24,35 +24,63 @@ export const auth = (...roles : UserRole[])=>{
         // is decoded exit
         // is user status active
       try {
-          const token = req.headers.authorization;
+          let token = req.headers.authorization;
           console.log("Token:", token);
+          
         if(!token){
-            throw new Error("token not foound")
+            const error = new Error("Token not found") as any;
+            error.status = 401;
+            throw error;
         }
-        const decode = jwt.verify(token,secret) as JwtPayload
 
-        console.log("decode info",decode);
+        // Handle "Bearer token" format
+        if (token.startsWith('Bearer ')) {
+          token = token.slice(7);
+        }
+
+        const decode = jwt.verify(token, secret) as JwtPayload
+
+        console.log("decode info", decode);
         const isUserExits = await prisma.user.findUnique({
             where : {
                 email: decode.email
             }
         })
-        console.log("isUserExits",isUserExits);
+        console.log("isUserExits", isUserExits);
         if(!isUserExits){
-            throw new Error("Unauthorized")
+            const error = new Error("User not found") as any;
+            error.status = 401;
+            throw error;
         }
 
        
-        console.log("roles",roles);
+        console.log("roles", roles);
         if(roles.length && !roles.includes(decode.role)){
-            throw new Error("Unauthorized")
+            const error = new Error("Insufficient permissions") as any;
+            error.status = 403;
+            throw error;
         }
 
         req.user = decode ;
 
         next()
-      } catch (error) {
-        next(error)
+      } catch (error: any) {
+        if (error.status) {
+          // Custom error with status code
+          const err = error as any;
+          err.status = error.status;
+          next(err);
+        } else if (error instanceof jwt.JsonWebTokenError) {
+          // JWT-specific errors
+          const err = new Error("Invalid token") as any;
+          err.status = 401;
+          next(err);
+        } else {
+          // Other errors
+          const err = error as any;
+          err.status = err.status || 500;
+          next(err);
+        }
       }
     }
 }
